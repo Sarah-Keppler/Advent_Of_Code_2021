@@ -36,7 +36,7 @@ int main()
             begin = false;
         }
         for (unsigned int it = 0, et = line.size(); et > it; ++it)
-            if ('0' == line[it])
+            if ('1' == line[it])
                 ++ones[it];
             else
                 ++zeros[it];
