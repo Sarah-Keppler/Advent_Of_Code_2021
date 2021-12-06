@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <string>
 
 int main()
@@ -19,7 +18,5 @@ int main()
         else
             y -= val;
     }
-    std::cerr << "y: " << y << std::endl
-              << "x: " << x << std::endl;
     std::cout << y * x << std::endl;
 }

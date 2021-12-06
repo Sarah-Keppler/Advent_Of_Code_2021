@@ -13,8 +13,8 @@ int main()
     std::vector<int> sums{};
     for (unsigned int it = 0, et = inputs.size(); et > (it + 2); ++it)
         sums.emplace_back(std::stoi(inputs[it]) + std::stoi(inputs[it + 1]) + std::stoi(inputs[it + 2]));
-    int p = sums[0], c = 0;
-    bool begin = true;
+    int pre{sums[0]}, count{0};
+    bool begin{true};
     for (int sum : sums)
     {
         if (begin)
@@ -22,9 +22,9 @@ int main()
             begin = false;
             continue;
         }
-        if (p < sum)
-            ++c;
-        p = sum;
+        if (pre < sum)
+            ++count;
+        pre = sum;
     }
-    std::cout << c << std::endl;
+    std::cout << count << std::endl;
 }
