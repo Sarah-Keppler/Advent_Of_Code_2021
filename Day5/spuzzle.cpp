@@ -3,19 +3,22 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <cstdlib>
 
 typedef std::pair<int, int> point;
 
-static void pPtn(point const &ptn)
+static void fillDiag(std::vector<std::string> &board, std::pair<point, point> const &points)
 {
-    std::cerr << "[" << ptn.first << ", " << ptn.second << "]" << std::endl;
-}
-
-static void pVect(std::vector<std::pair<point, point>> const &vect)
-{
-    for (std::pair<point, point> pair : vect)
+    int xmult{(points.first.first > points.second.first) ? -1 : 1};
+    int ymult{(points.first.second > points.second.second) ? -1 : 1};
+    int dif{std::abs(points.first.first - points.second.first) + 1};
+    for (unsigned int i = 0; dif > i; ++i)
     {
-        std::cerr << "[" << pair.first.first << ", " << pair.first.second << "] -> [" << pair.second.first << ", " << pair.second.second << "]" << std::endl;
+        char c{board[points.first.second + i * ymult][points.first.first + i * xmult]};
+        if ('.' == c)
+            board[points.first.second + i * ymult][points.first.first + i * xmult] = '1';
+        else if ('1' == c)
+            board[points.first.second + i * ymult][points.first.first + i * xmult] = '2';
     }
 }
 
@@ -24,16 +27,9 @@ static void fillRow(std::vector<std::string> &board, std::pair<point, point> con
     point min{(points.first.first > points.second.first) ? points.second : points.first};
     point max{(points.first.first < points.second.first) ? points.second : points.first};
     int dif{max.first - min.first + 1};
-    std::cerr << "min: ";
-    pPtn(min);
-    std::cerr << "max: ";
-    pPtn(max);
-    std::cerr << "dif: " << dif << std::endl;
     for (unsigned int i = 0; dif > i; ++i)
     {
-        //std::cerr << "[" << min.first + i << ", " << min.second << "] => " << std::endl;
         char c{board[min.second][min.first + i]};
-        //std::cerr << "\t" << c << std::endl;
         if ('.' == c)
             board[min.second][min.first + i] = '1';
         else if ('1' == c)
@@ -48,9 +44,7 @@ static void fillCol(std::vector<std::string> &board, std::pair<point, point> con
     int dif{max.second - min.second + 1};
     for (unsigned int i = 0; dif > i; ++i)
     {
-        //std::cerr << "[" << min.second + i << ", " << min.first << "] => " << std::endl;
         char c{board[min.second + i][min.first]};
-        //std::cerr << "\t" << c << std::endl;
         if ('.' == c)
             board[min.second + i][min.first] = '1';
         else if ('1' == c)
@@ -73,30 +67,23 @@ int main()
     while (std::getline(file, line))
     {
         std::string start{line.substr(0, line.find(" -> "))}, end{line.substr(line.find(" -> ") + 4)};
-        std::cerr << "start:" << start << std::endl
-                  << "end:" << end << std::endl;
         point sp{crtPoint(start)}, ep{crtPoint(end)};
-        if (sp.first != ep.first && sp.second != ep.second)
-            continue;
         vect.emplace_back(sp, ep);
         xmax = (sp.first > xmax) ? sp.first : xmax;
         ymax = (sp.second > ymax) ? sp.second : ymax;
         xmax = (ep.first > xmax) ? ep.first : xmax;
         ymax = (ep.second > ymax) ? ep.second : ymax;
     }
-    pVect(vect);
-    std::cerr << "xmax:" << xmax << std::endl
-              << "ymax:" << ymax << std::endl;
     for (unsigned int y = 0; (ymax + 1) > y; ++y)
         board.emplace_back(xmax + 1, '.');
-    std::cerr << "size: " << board.size() << " : " << board[0].size() << std::endl;
     for (std::vector<std::pair<point, point>>::iterator it = vect.begin(), et = vect.end(); et != it; ++it)
     {
-        if (it->first.second == it->second.second)
+        if (it->first.second == it->second.second && it->first.first != it->second.first)
             fillRow(board, *it);
-        else
+        else if (it->first.second != it->second.second && it->first.first == it->second.first)
             fillCol(board, *it);
-        std::cerr << std::endl;
+        else
+            fillDiag(board, *it);
     }
     unsigned int count{0};
     for (std::string s : board)
